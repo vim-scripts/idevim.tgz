@@ -1,0 +1,169 @@
+*gdb.txt*  For Vim version 6.0z.  Last change: 2001 Jun 07
+
+
+		  VIM REFERENCE MANUAL    by Ligesh <ligesh@lxlinux.com>
+
+
+Ide Module 					*Vim-ide*
+
+1. Overview				|ide-overview|
+2. Assembly Debugging			|ide-assembly|
+
+{Needles to say, Vi doesn't have all these features} 
+
+=============================================================================
+
+1. Overview				*ide-overview* *ide* *gdb*
+
+ This is plugin and library which turns Vim into the best Ide in the 
+world. :-) You can access all the Gdb functions and features; on execution, 
+the window is split, and the source position is shown in the top window,
+while the data appears in the bottom. The function to access gdb is - 'Ide'
+(Note the capital I). For example the gdb 'frame' command
+can be run as  
+
+	:Ide frame 
+
+Similerly, >
+	:Ide help info
+	:Ide step
+<
+	does whatever gdb does with these commands.
+
+NOTE: The plugin wont work unless the 'compatible' is off. If you get very strange 
+behaviour, create a blank .vimrc file in your HOME. See 'compatible'
+
+Starting Gdb			       *gdbstart* *gdb-start*
+ 
+ First gdb should be started, which can be done by running,
+
+	:Idestart <arguments>
+
+ The arguments are the normal Gdb arguments, For example >
+ 	:Idestart a.out core
+<
+	will execute 'gdb a.out core' in the background.
+
+
+
+ Gdb Commands				*gdb-commands*
+ 
+ All the gdb commands can be run this way. The arguments to the 'Ide' function
+is simply passed to gdb server in the background. Just running ':Ide', without
+any arguments will re-execute the previous command.
+
+ In the Data Window, pressing <Enter> will execute the last command. 
+ 
+ Some key maps that would make sense...
+
+	This will print the variable under the cursor. >
+ 	:map _p :Ide print <cword><CR>
+<
+
+ Generic mappings >
+	:map _g :Ide 
+	:cab ide Ide 
+<
+
+
+	Or better still, 
+
+ This will set a breakpoint at the current line in the file. Pretty cool 
+eh?  >
+	:map _b :exe 'Ide break ' .expand("%:t"). ':' .line(".")<CR>
+<
+
+
+ And this will continue execution of the program until you reach the 
+current position in the file. Whoa!  >
+	 :map _u :exe 'Ide until ' .expand("%:t"). ':' .line(".")<CR>
+<
+
+
+					*Ide-completion* *Ide-tag* *Ide-tab*
+ 
+ Vim will try to complete the function name or the variable name when you
+press a <C-d>. As Vim doesn't have access to the executable, it searches 
+the tag file for the matching function and hence lack of tag file will 
+produce an error.
+
+ Ide Statusline.			*Ide-statusline* *Ide-stl*
+ 
+ When you start gdb, an extra term, '[Gdb:<command>:]' will appear on the
+status line, where <command> is the last executed Ide command. This will help
+you when you are re-executing the previous command.
+This term will be cleared when gdb is terminated. This feature is not tested
+well and could cause problems. You can disable it by giving this line in your
+.vimrc.  
+	:let g:gdb_statusline = 0
+
+
+
+ Gdb Interrupt.				*Gdb-interrupt*
+
+ If Gdb blocks, you can interrupt it using <C-c> and if it doesn't respond, 
+you can terminate it with <C-k>, which means you will never get stuck
+(Famous LW). As of now this doesn't work correctly when running
+the program in the foreground, and  works only when you use gdb to attach to 
+a process. If started with the server feature, Gdb will never block. 
+See vintr.
+
+
+2. Assembly Debugging			 *assembly* *asm* *asmopen*
+ 
+ To see the the assembly of your code run, 
+	:Asmopen
+
+ A disassembly of the function surrounding the current position will be shown
+in a separate window with the current position highlighted. Vim will keep 
+track of the timestamps, and hence when you recompile the program, the old 
+dump will be cleared and new disassembly created.
+
+ To stop showing the disassembly code, just close this window.
+
+
+3. Vim Run				*vim_run* 
+
+ You have to create a target called 'vim_run' in your Makefile for automatic 
+execution and core-dump detection to work. This target is used on a successful
+make. eg. Add this to your makefile >
+
+ vim_run:
+ 	a.out <arguments>
+<
+ 
+ Vim will execute this target when the 'make' is successful.
+ 
+Gdb Busy				*Ide-busy* *g:gdb_busy_sign*
+
+					Default value: 'Busy:'
+ 
+ In Asynchronous operation, when gdb is working in the background, a Busy flag 
+will appear in the statusline. You can change it by giving this in your .vimrc.>
+
+	let g:gdb_busy_sign = '#'
+<
+
+Interrupt				*ide-interrupt* *ide-vintr*
+ 
+ :Ide vintr
+ In Asynchronous method of communication, Gdb can be interrupted by using the 
+command ":Ide vintr". This works like Ctl-c and sends and interrupt signal to Gdb.
+See vterm and vkill.
+
+Terminate				*Ide-terminate* *ide-vterm*
+
+ :Ide vterm
+ This will send a term signal to Gdb. See vintr.
+
+Kill					*Ide-kill* *Ide-vkill*
+
+ :Ide vkill
+ This will kill the Gdb and clean all the records. See vintr.
+
+Todo					*Ide-todo*
+ 
+Clean the code up.
+ 
+   
+==============================================================================

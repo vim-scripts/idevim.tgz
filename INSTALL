@@ -1,0 +1,16 @@
+
+		    Gdb Interface for Vim.
+		    		ligesh ligesh@lxlinux.com
+
+
+INSTALL:
+
+ Set the variable VIM_VERSION to the version of vim, and do a make install
+
+EXAMPLE:
+
+	# export VIM_VERSION=60
+	# make install
+
+	In Vim type....     :help ide
+
